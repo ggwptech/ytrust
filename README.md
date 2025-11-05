@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YTrust - YouTube Revenue Leaderboard
 
-## Getting Started
+A transparent platform for YouTube creators to share and compare their revenue data.
 
-First, run the development server:
+## Features
+
+- 🔐 **Google OAuth Authentication** - Secure sign-in with YouTube account
+- 📊 **Live Leaderboard** - Real-time rankings based on revenue
+- 💰 **Revenue Analytics** - Direct integration with YouTube Analytics API
+- 🎭 **Anonymous Mode** - Option to hide your channel name
+- 🐦 **X Integration** - Link your Twitter/X account
+- 🎨 **YouTube Design** - Familiar red theme and modern UI
+
+## Setup Instructions
+
+### 1. Google Cloud Console Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable the following APIs:
+   - YouTube Data API v3
+   - YouTube Analytics API
+4. Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID"
+5. Configure OAuth consent screen:
+   - User Type: External
+   - Scopes: Add `https://www.googleapis.com/auth/yt-analytics.readonly`
+6. Create OAuth 2.0 Client ID:
+   - Application type: Web application
+   - Authorized redirect URIs: `http://localhost:3000/api/auth/callback/google`
+7. Copy the Client ID and Client Secret
+
+### 2. Environment Variables
+
+Update `.env.local` with your credentials:
+
+```env
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+NEXTAUTH_SECRET=your_nextauth_secret_here
+NEXTAUTH_URL=http://localhost:3000
+```
+
+To generate `NEXTAUTH_SECRET`, run:
+```bash
+openssl rand -base64 32
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 16** - React framework with App Router
+- **NextAuth.js** - Authentication with Google OAuth
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **Google APIs** - YouTube Data & Analytics API
+- **Lucide React** - Icons
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+ytrust/
+├── app/
+│   ├── api/
+│   │   ├── auth/[...nextauth]/route.ts  # NextAuth configuration
+│   │   ├── channels/route.ts            # Get all channels
+│   │   └── connect/route.ts             # Connect YouTube channel
+│   ├── connect/page.tsx                 # Channel connection form
+│   ├── dashboard/page.tsx               # Leaderboard page
+│   ├── page.tsx                         # Landing page
+│   ├── layout.tsx                       # Root layout
+│   └── providers.tsx                    # SessionProvider wrapper
+├── components/                          # Reusable components
+├── lib/
+│   ├── db.ts                           # Database functions (JSON storage)
+│   └── utils.ts                        # Utility functions
+├── types/
+│   ├── index.ts                        # TypeScript interfaces
+│   └── next-auth.d.ts                  # NextAuth type extensions
+└── data/
+    └── channels.json                   # Channel data storage
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How It Works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Sign In** - Users authenticate with Google OAuth
+2. **Grant Permissions** - Authorize YouTube Analytics API access
+3. **Fetch Revenue** - App retrieves revenue data from last 28 days
+4. **Save Channel** - Store channel info with optional Twitter handle and anonymous mode
+5. **Display Leaderboard** - Rank channels by revenue in real-time
 
-## Deploy on Vercel
+## Database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Currently uses JSON file storage (`data/channels.json`) for simplicity. For production, migrate to:
+- PostgreSQL
+- MongoDB
+- Supabase
+- Firebase
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Endpoints
+
+### GET `/api/channels`
+Returns all channels sorted by revenue (descending)
+
+### POST `/api/connect`
+Connects a YouTube channel
+- Body: `{ twitterHandle?: string, isAnonymous: boolean }`
+- Returns: Channel data with revenue
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+
+## License
+
+MIT
+
