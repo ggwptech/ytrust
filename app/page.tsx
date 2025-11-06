@@ -84,13 +84,13 @@ export default function LandingPage() {
               © 2025 YTrust. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-gray-600">
-              <a href="#" className="hover:text-red-600 transition-colors">
+              <Link href="/privacy" className="hover:text-red-600 transition-colors">
                 Privacy Policy
-              </a>
-              <a href="#" className="hover:text-red-600 transition-colors">
+              </Link>
+              <Link href="/terms" className="hover:text-red-600 transition-colors">
                 Terms of Service
-              </a>
-              <a href="#" className="hover:text-red-600 transition-colors">
+              </Link>
+              <a href="mailto:lutinlutin76@gmail.com" className="hover:text-red-600 transition-colors">
                 Contact
               </a>
             </div>

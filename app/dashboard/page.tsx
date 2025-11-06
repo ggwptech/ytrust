@@ -315,6 +315,28 @@ export default function DashboardPage() {
           </table>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-200 mt-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-gray-600 text-sm">
+              © 2025 YTrust. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm text-gray-600">
+              <Link href="/privacy" className="hover:text-red-600 transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-red-600 transition-colors">
+                Terms of Service
+              </Link>
+              <a href="mailto:lutinlutin76@gmail.com" className="hover:text-red-600 transition-colors">
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
