@@ -2,6 +2,7 @@
 
 import { useSession, signOut, signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Plus, X, LogOut } from "lucide-react"
 import { formatRevenue } from "@/lib/utils"
