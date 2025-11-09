@@ -1,33 +1,74 @@
 import { Channel } from "@/types"
-import fs from "fs/promises"
-import path from "path"
+import clientPromise from "./mongodb"
 
-const DATA_FILE = path.join(process.cwd(), "data", "channels.json")
+const DB_NAME = "ytrustdata"
+const COLLECTION_NAME = "channels"
 
 export async function getAllChannels(): Promise<Channel[]> {
   try {
-    const data = await fs.readFile(DATA_FILE, "utf-8")
-    return JSON.parse(data)
+    const client = await clientPromise
+    const db = client.db(DB_NAME)
+    const channels = await db
+      .collection(COLLECTION_NAME)
+      .find({})
+      .sort({ revenue: -1 })
+      .toArray()
+    
+    return channels.map(doc => ({
+      id: doc.id,
+      userId: doc.userId,
+      channelId: doc.channelId,
+      channelName: doc.channelName,
+      isAnonymous: doc.isAnonymous,
+      twitterHandle: doc.twitterHandle,
+      revenue: doc.revenue,
+      lastUpdated: doc.lastUpdated,
+      createdAt: doc.createdAt,
+    }))
   } catch (error) {
+    console.error("Failed to fetch channels:", error)
     return []
   }
 }
 
 export async function saveChannel(channel: Channel): Promise<void> {
-  const channels = await getAllChannels()
-  const existingIndex = channels.findIndex(c => c.channelId === channel.channelId)
-  
-  if (existingIndex >= 0) {
-    channels[existingIndex] = channel
-  } else {
-    channels.push(channel)
+  try {
+    const client = await clientPromise
+    const db = client.db(DB_NAME)
+    
+    await db.collection(COLLECTION_NAME).updateOne(
+      { channelId: channel.channelId },
+      { $set: channel },
+      { upsert: true }
+    )
+  } catch (error) {
+    console.error("Failed to save channel:", error)
+    throw error
   }
-  
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true })
-  await fs.writeFile(DATA_FILE, JSON.stringify(channels, null, 2))
 }
 
 export async function getChannelsByUserId(userId: string): Promise<Channel[]> {
-  const channels = await getAllChannels()
-  return channels.filter(c => c.userId === userId)
+  try {
+    const client = await clientPromise
+    const db = client.db(DB_NAME)
+    const channels = await db
+      .collection(COLLECTION_NAME)
+      .find({ userId })
+      .toArray()
+    
+    return channels.map(doc => ({
+      id: doc.id,
+      userId: doc.userId,
+      channelId: doc.channelId,
+      channelName: doc.channelName,
+      isAnonymous: doc.isAnonymous,
+      twitterHandle: doc.twitterHandle,
+      revenue: doc.revenue,
+      lastUpdated: doc.lastUpdated,
+      createdAt: doc.createdAt,
+    }))
+  } catch (error) {
+    console.error("Failed to fetch user channels:", error)
+    return []
+  }
 }
