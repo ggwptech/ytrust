@@ -55,7 +55,26 @@ export async function POST(req: NextRequest) {
     const startDate = new Date()
     startDate.setDate(startDate.getDate() - 28) // Last 28 days
 
+    // STEP 1: Test Analytics API access with views metric (available for all channels)
+    console.log("=== Testing Analytics API access ===")
+    try {
+      const viewsResponse = await youtubeAnalytics.reports.query({
+        ids: `channel==${channelId}`,
+        startDate: startDate.toISOString().split("T")[0],
+        endDate: endDate.toISOString().split("T")[0],
+        metrics: "views",
+      })
+
+      const totalViews = viewsResponse.data.rows?.[0]?.[0] || 0
+      console.log(`✅ Analytics API access OK - Channel has ${totalViews} views in last 28 days`)
+    } catch (error: any) {
+      console.error("❌ Analytics API access FAILED for views metric:", error?.message)
+      console.error("Error details:", { code: error?.code, status: error?.status })
+    }
+
+    // STEP 2: Try to get revenue (only works for monetized channels)
     let revenue = 0
+    console.log("=== Testing Revenue API access ===")
     try {
       const analyticsResponse = await youtubeAnalytics.reports.query({
         ids: `channel==${channelId}`,
@@ -67,9 +86,14 @@ export async function POST(req: NextRequest) {
 
       const rows = analyticsResponse.data.rows || []
       revenue = rows.reduce((sum, row) => sum + (row[1] as number || 0), 0)
-    } catch (error) {
-      console.error("Failed to fetch analytics:", error)
-      // If analytics fails, use a placeholder value
+      console.log(`✅ Revenue API access OK - Revenue: $${revenue}`)
+    } catch (error: any) {
+      if (error?.code === 401 || error?.status === 401) {
+        console.log("⚠️  Channel not monetized - Revenue data unavailable (expected for non-YPP channels)")
+      } else {
+        console.error("❌ Revenue API access FAILED:", error?.message)
+        console.error("Error details:", { code: error?.code, status: error?.status })
+      }
       revenue = 0
     }
 
