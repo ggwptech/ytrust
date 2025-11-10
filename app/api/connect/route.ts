@@ -88,12 +88,24 @@ export async function POST(req: NextRequest) {
       revenue = rows.reduce((sum, row) => sum + (row[1] as number || 0), 0)
       console.log(`✅ Revenue API access OK - Revenue: $${revenue}`)
     } catch (error: any) {
-      if (error?.code === 401 || error?.status === 401) {
-        console.log("⚠️  Channel not monetized - Revenue data unavailable (expected for non-YPP channels)")
-      } else {
-        console.error("❌ Revenue API access FAILED:", error?.message)
-        console.error("Error details:", { code: error?.code, status: error?.status })
+      const status = error?.code ?? error?.status ?? error?.response?.status
+      const responseError = error?.response?.data?.error
+      const reason = responseError?.errors?.[0]?.reason ?? error?.errors?.[0]?.reason
+      const message = responseError?.message ?? error?.message
+
+      console.error("❌ Revenue API access FAILED", {
+        status,
+        reason,
+        message,
+        errors: responseError?.errors,
+      })
+
+      if (status === 401) {
+        console.warn(
+          "Received 401 when requesting estimatedRevenue. This usually means the channel has not granted rights to monetization data or is not in the YouTube Partner Program."
+        )
       }
+
       revenue = 0
     }
 
