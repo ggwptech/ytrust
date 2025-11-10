@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     console.log("=== Testing Analytics API access ===")
     try {
       const viewsResponse = await youtubeAnalytics.reports.query({
-        ids: `channel==${channelId}`,
+        ids: "channel==MINE",
         startDate: startDate.toISOString().split("T")[0],
         endDate: endDate.toISOString().split("T")[0],
         metrics: "views",
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     console.log("=== Testing Revenue API access ===")
     try {
       const analyticsResponse = await youtubeAnalytics.reports.query({
-        ids: `channel==${channelId}`,
+        ids: "channel==MINE",
         startDate: startDate.toISOString().split("T")[0],
         endDate: endDate.toISOString().split("T")[0],
         metrics: "estimatedRevenue",
