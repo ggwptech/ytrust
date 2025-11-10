@@ -145,7 +145,7 @@ export default function DashboardPage() {
 
               {/* Dropdown Modal */}
               {showModal && (
-                <div style={{backgroundColor: '#ffffff', opacity: 1}} className="absolute right-0 mt-4 w-96 rounded-2xl shadow-2xl border-2 border-gray-400 z-50 p-6 animate-scale-in">
+                <div style={{backgroundColor: '#ffffff', opacity: 1}} className="absolute right-0 mt-4 w-96 rounded-2xl shadow-2xl border-2 border-gray-400 z-[9999] p-6 animate-scale-in">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-2xl font-bold text-gray-900">Add Channel</h3>
                     <button
